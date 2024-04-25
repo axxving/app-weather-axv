@@ -46,10 +46,7 @@ const App = () => {
         icon: data.current.condition.icon,
         conditionText: data.current.condition.text,
       });
-      console.log(data);
     } catch (error) {
-      console.log(error);
-
       setError({
         error: true,
         message: error.message,
