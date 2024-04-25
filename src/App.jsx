@@ -1,7 +1,7 @@
-import { Message } from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
+import { useState } from "react";
 import { Box, Container, TextField, Typography } from "@mui/material";
-import React, { useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { Message } from "@mui/icons-material";
 
 const API_WEATHER = `https://api.weatherapi.com/v1/current.json?key=${
   import.meta.env.VITE_API_KEY
@@ -14,6 +14,14 @@ const App = () => {
     error: false,
     message: "",
   });
+  const [weather, setWeather] = useState({
+    city: "",
+    country: "",
+    temp: "",
+    condition: "",
+    icon: "",
+    conditionText: "",
+  });
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -23,14 +31,22 @@ const App = () => {
       message: "",
     });
 
-    const [weather, setWeather] = useState({
-      
-    })
-
     try {
-      if (!city.trim()) throw { message: "El campo ciudad es obligatorio" };
-      {
-      }
+      if (!city.trim()) throw new Error("El campo ciudad es obligatorio");
+      const response = await fetch(`${API_WEATHER}${city}`);
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error.message);
+
+      setWeather({
+        city: data.location.name,
+        country: data.location.country,
+        temp: data.current.temp_c,
+        condition: data.current.condition.code,
+        icon: data.current.condition.icon,
+        conditionText: data.current.condition.text,
+      });
+      console.log(data);
     } catch (error) {
       console.log(error);
 
@@ -66,7 +82,7 @@ const App = () => {
             onChange={(e) => setCity(e.target.value)}
             error={error.error}
             helperText={error.message}
-          ></TextField>
+          />
           <LoadingButton
             type="submit"
             variant="contained"
@@ -76,6 +92,36 @@ const App = () => {
             Buscar
           </LoadingButton>
         </Box>
+
+        {weather.city && (
+          <Box
+            sx={{
+              mt: 2,
+              display: "grid",
+              gap: 2,
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="h4" component="h2">
+              {weather.city}, {weather.country}
+            </Typography>
+
+            <Box
+              component="img"
+              alt={weather.conditionText}
+              src={weather.icon}
+              sx={{ margin: "0 auto" }}
+            />
+
+            <Typography variant="h5" component="h3">
+              {weather.temp} Grados
+            </Typography>
+
+            <Typography variant="h6" component="h4">
+              {weather.conditionText}
+            </Typography>
+          </Box>
+        )}
 
         <Typography textAlign="center" sx={{ mt: 2, fontSize: "10px" }}>
           {" "}
