@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Box, Container, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Message } from "@mui/icons-material";
-import axios from "axios"; // Importar axios
 
 const API_WEATHER = `https://api.weatherapi.com/v1/current.json?key=${
   import.meta.env.VITE_API_KEY
@@ -34,10 +33,8 @@ const App = () => {
 
     try {
       if (!city.trim()) throw new Error("El campo ciudad es obligatorio");
-
-      // Usar axios en lugar de fetch
-      const response = await axios.get(`${API_WEATHER}${city}`);
-      const data = response.data;
+      const response = await fetch(`${API_WEATHER}${city}`);
+      const data = await response.json();
 
       if (data.error) throw new Error(data.error.message);
 
